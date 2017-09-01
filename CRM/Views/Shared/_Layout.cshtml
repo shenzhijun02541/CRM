@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        .nav-tabs {
+            border-bottom:0px;
+        }
+        /*.dropdown-toggle {
+            background: url("../Images/Textures/pattern4.png") repeat scroll 0 0 #f4f4f4;
+        }*/
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <ul class="nav nav-tabs">
+                <li><a href="/Home/Index">首页</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">市场管理<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Activity/Index">活动管理  </a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">人力资源管理<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Cemp/Index">人员管理</a></li>
+                        <li><a href="/Crole/Index">角色管理</a></li>
+                        <li><a href="/Cdept/Index">部门管理</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script type="text/javascript">
+        $('.nav').find('a').each(function () {
+            if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+                $('.nav').find('li').removeClass('active');
+                if ($(this).parent().parent().attr('class') == 'dropdown-menu') {
+                    $(this).parent().parent().parent().addClass('active');
+                }
+                else if ($(this).parent().parent().attr('class') == 'nav nav-tabs') {
+                    $(this).parent().addClass('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

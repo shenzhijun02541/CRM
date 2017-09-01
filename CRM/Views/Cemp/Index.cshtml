@@ -1,0 +1,176 @@
+﻿
+@{
+    ViewBag.Title = "人员管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lmd = ViewData["lmd"] as IList<Model.Cemp>;
+}
+
+<div style="margin-top:30px">
+    <div class="container-fluid" style="margin-bottom:30px">
+        <div class="row">          
+                <!--编辑/增加的项目-->
+                <div class="col-md-1" >姓名</div>
+                <div class="col-md-2" style="margin-left:-20px">
+                    <input type="text" id="cene" class="form-control" />
+                </div>
+                <div class="col-md-1">职位</div>
+                <div class="col-md-2" style="margin-left:-20px">
+                    <input type="text" id="cjob" class="form-control" />
+                </div>             
+                <div class="col-md-1">工资</div>
+                <div class="col-md-2" style="margin-left:-20px">
+                    <input type="text" id="csal" class="form-control" />
+                </div>
+                <div class="col-md-1">奖金</div>
+                <div class="col-md-2" style="margin-left:-20px">
+                    <input type="text" id="comm" class="form-control" />
+                </div>
+                    <div class="col-md-1">入职时间</div>
+                    <div class="col-md-2" style="margin-left:-20px">
+                        <input type="text" id="hiredate" class="form-control" />
+                    </div>
+                    <input type="hidden" id="ceno" value="" />
+                    <div class=" col-md-1">
+                        <input type="button" value="新增" onclick="AddOrEdit()" id="btn" class="btn btn-primary" />
+                    </div>
+        </div>
+    </div>
+    <table class="datatable tables">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>姓名</th>
+                <th>职位</th>
+                <th>工资</th>
+                <th>奖金</th>
+                <th>入职时间</th>
+                <th>操作</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var md in lmd)
+            {
+                <tr>
+                    <td>@md.ceno</td>
+                    <td>@md.cene</td>
+                    <td>@md.cjob</td>
+                    <td>@md.csal</td>
+                    <td>@md.comm</td>
+                    <td>@md.hiredate</td>
+                    <td><a onclick="Update('@md.ceno','@md.cene','@md.cjob','@md.csal','@md.comm','@md.hiredate.ToString("yyyy-MM-dd")')" style="cursor:pointer">编辑</a></td>
+                    <td><a onclick="Delete(@md.ceno)" style="cursor:pointer">删除</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $('#hiredate').datetimepicker({
+        format: 'yyyy-MM-dd hh:ii',
+        language: 'zh-CN'
+    });
+
+    //新增修改
+    function AddOrEdit() {
+        var ceno = $("#ceno").val();
+        var cene = $("#cene").val();
+        var cjob = $("#cjob").val();
+        var csal = $("#csal").val();
+        var comm = $("#comm").val();
+        var hiredate = $("#hiredate").val();
+        if (cene == "") {
+            alert("请输入姓名！");
+            return false;
+        }
+        if (ceno == "") {
+            var jsonString = "";
+            jsonString = "{\"cene\":\"" + cene + "\",\"cjob\":\"" + cjob + "\",\"csal\":\"" + csal + "\",\"comm\":\"" + comm + "\",\"hirdate\":\"" + hiredate+ "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Cemp/Add",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("添加成功！");
+                        location.href = "/Cemp/Index";
+                    } else {
+                        alert("添加失败！");
+                    }
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        } else {
+            var jsonString = "";
+            jsonString = "{\"ceno\":\"" + ceno + "\",\"cene\":\"" + cene + "\",\"cjob\":\"" + cjob + "\",\"csal\":\"" + csal + "\",\"comm\":\"" + comm + "\",\"hirdate\":\"" + hiredate + "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Cemp/Update",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("修改成功！");
+                        location.href = document.URL;
+                    } else {
+                        alert("修改失败！");
+                    }
+                    $("#cene").val("");
+                    $("#ceno").val("");
+                    $("#cjob").val("");
+                    $("#csal").val("");
+                    $("#comm").val("");
+                    $("#hiredate").val("");
+                    $("#btn").val("新增");
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        }
+
+    }
+    //删除
+    function Delete(ceno) {
+        var jsonString = "";
+        jsonString = "{\"ceno\":\"" + ceno+ "\"}";
+        $.ajax({
+            type: "POST",   //访问WebService使用Post方式请求
+            contentType: "application/json", //WebService 会返回Json类型
+            url: "../Cemp/Delete",
+            data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+            dataType: 'json',
+            success: function (result) {     //回调函数，result，返回值
+                if (result.messagecode == "1") {
+                    alert("删除成功！");
+                    location.href = "/Cemp/Index";
+                } else {
+                    alert("删除失败！");
+                }
+                return false;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+            }
+        });
+    }
+    //编辑
+    function Update(ceno, cene, cjob, csal, comm, hiredate) {
+        $("#cene").val(cene);
+        $("#ceno").val(ceno);
+        $("#cjob").val(cjob);
+        $("#csal").val(csal);
+        $("#comm").val(comm);
+        $("#hiredate").val(hiredate);
+        $("#btn").val("编辑");
+    }
+
+</script>
+

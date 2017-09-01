@@ -1,0 +1,133 @@
+﻿
+@{
+    ViewBag.Title = "角色管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lmd = ViewData["lmd"] as IList<Model.Crole>;
+}
+
+<div style="margin-top:30px">
+    <div class="container-fluid" style="margin-bottom:30px">
+        <div class="row">
+            <div class="pull-right">
+                <div class="col-lg-4 col-md-4 col-sm-1 " style="line-height:34px">角色名称：</div>
+                <div class="col-lg-6 col-md-6 col-sm-2" style="margin-left:-35px">
+                    <input type="text" id="crne" class="form-control" />
+                </div>
+                <input type="hidden" id="crno" value="" />
+                <div class="col-lg-2 col-md-2 col-sm-1">
+                    <input type="button" value="新增" onclick="AddOrEdit()" id="btn" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="datatable tables">
+        <thead>
+            <tr>
+                <th>角色名称</th>
+                <th>操作</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var md in lmd)
+            {
+                <tr>
+                    <td>@md.crne</td>
+                    <td><a onclick="Update('@md.crne','@md.crno')" style="cursor:pointer">编辑</a></td>
+                    <td><a onclick="Delete(@md.crno)" style="cursor:pointer">删除</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    //新增修改
+    function AddOrEdit() {
+        var crne = $("#crne").val();
+        var crno = $("#crno").val();
+        if (crne== "") {
+            alert("请输入角色名称！");
+            return false;
+        }
+        if (crno == "") {
+            var jsonString = "";
+            jsonString = "{\"crne\":\"" + crne + "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Crole/Add",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("添加成功！");
+                        location.href = "/Crole/Index";
+                    } else {
+                        alert("添加失败！");
+                    }
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        } else {
+            var jsonString = "";
+            jsonString = "{\"crne\":\"" + crne + "\",\"crno\":\"" + crno + "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Crole/Update",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("修改成功！");
+                        location.href = document.URL;
+                    } else {
+                        alert("修改失败！");
+                    }
+                    $("#crne").val("");
+                    $("#crno").val("");
+                    $("#btn").val("新增");
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        }
+
+    }
+    //删除
+    function Delete(crno) {
+        var jsonString = "";
+        jsonString = "{\"crno\":\"" + crno+ "\"}";
+        $.ajax({
+            type: "POST",   //访问WebService使用Post方式请求
+            contentType: "application/json", //WebService 会返回Json类型
+            url: "../Crole/Delete",
+            data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+            dataType: 'json',
+            success: function (result) {     //回调函数，result，返回值
+                if (result.messagecode == "1") {
+                    alert("删除成功！");
+                    location.href = "/Crole/Index";
+                } else {
+                    alert("删除失败！");
+                }
+                return false;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+            }
+        });
+    }
+    //编辑
+    function Update(crne, crno) {
+        $("#crne").val(crne);
+        $("#crno").val(crno);
+        $("#btn").val("编辑");
+    }
+
+</script>

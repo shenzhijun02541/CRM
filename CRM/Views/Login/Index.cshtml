@@ -1,0 +1,62 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE HTML>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>登录页</title>
+        <!--[if lt IE 9]>
+        <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <script src="Javascript/Flot/excanvas.js"></script>
+    <![endif]-->
+        <!-- The Fonts -->
+        <link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet">
+        <!-- The Main CSS File -->
+        <link rel="stylesheet" href="~/Content/style.css">
+    </head>
+    <body>
+        <div class="wrapper contents_wrapper">
+
+            <div class="login">
+                <div class="widget_header">
+                    <h4 class="widget_header_title wwIcon i_16_login">Login</h4>
+                </div>
+                <div class="widget_contents lgNoPadding">
+                    <form action="/Login/Check">
+                        <div class="line_grid">
+                            <div class="g_2 g_2M"><span class="label">UserName</span></div>
+                            <div class="g_10 g_10M">
+                                <input class="simple_field tooltip" title="cuname" type="text" name="cuname" placeholder="cuname">
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="line_grid">
+                            <div class="g_2 g_2M"><span class="label">PassWord</span></div>
+                            <div class="g_10 g_10M">
+                                <input class="simple_field tooltip" title="cpassword" type="password" name="cpassword" placeholder="cpassword">
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="line_grid">
+                            <div class="g_6">
+                                <input class="submitIt simple_buttons" value="Log In" type="submit">
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div style="display:none">
+            <script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script>
+        </div>
+
+    </body>
+</html>
+
+

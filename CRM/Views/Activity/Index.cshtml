@@ -1,0 +1,263 @@
+﻿@using Webdiyer.WebControls.Mvc;
+
+@{
+    ViewBag.Title = "活动管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var pagems = ViewData["pagems"] as PagedList<Model.Activity>;
+    var lmr = ViewData["lmr"] as IList<Model.Crole>;
+    Dictionary<int, string> acResult = LIB.EnumHelper.GetEnumDictionary(typeof(Model.acResult));
+    string acName = ViewBag.acName.ToString();
+    int Result = Convert.ToInt32(ViewBag.acResult);
+    int acRole = Convert.ToInt32(ViewBag.acRole);
+}
+
+<div style="margin-top:30px">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-1 col-sm-1">名称：</div>
+            <div class="col-lg-1 col-md-4 col-sm-4">
+                <input type="text" id="acName" class="form-control" value="@acName" />
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1">预算：</div>
+            <div class="col-lg-1 col-md-4 col-sm-4">
+                <input type="text" id="acBudget" class="form-control" />
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1">预期：</div>
+            <div class="col-lg-2 col-md-4 col-sm-4">
+                <select id="acResult" class="form-control">
+                    <option value="-1">请选择</option>
+                    @foreach (KeyValuePair<int, string> kvp in acResult)
+                    {
+                        if (Result != kvp.Key)
+                        {
+                            <option value="@kvp.Key">@kvp.Value</option>
+                        }
+                        else
+                        {
+                            <option value="@kvp.Key" selected="selected">@kvp.Value</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1">责任人：</div>
+            <div class="col-lg-2 col-md-4 col-sm-4">
+                <select id="acRole" class="form-control">
+                    <option value="-1">请选择</option>
+                    @foreach (var r in lmr)
+                    {
+                        if (acRole != r.crno)
+                        {
+                            <option value="@r.crno">@r.crne</option>
+                        }
+                        else
+                        {
+                            <option value="@r.crno" selected="selected">@r.crne</option>
+                        }
+                    }
+                </select>
+            </div>
+            <input type="hidden" id="acId" value="" />
+            <div class="col-lg-2 col-lg-2 col-md-2 col-sm-2">
+                <input type="button" value="新增" style="margin-left:10px" onclick="AddOrEdit()" id="btn" class="btn btn-primary" />
+                <input type="button" value="查询" style="margin-left:10px" onclick="Search()" id="btn" class="btn btn-primary" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-1 col-md-1 col-sm-1">开始：</div>
+            <div class="col-lg-2 col-md-4 col-sm-4">
+                <input type="text" id="acBeginTime" class="form-control" />
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1">结束：</div>
+            <div class="col-lg-2 col-md-4 col-sm-4">
+                <input type="text" id="acEndTime" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+
+    <table class="table table-hover" style="margin-top:10px">
+        <tr>
+            <th>活动名称</th>
+            <th>活动预算</th>
+            <th>活动预期</th>
+            <th>责任人</th>
+            <th>操作</th>
+            <th>操作</th>
+        </tr>
+        @foreach (var ms in pagems)
+            {
+            <tr>
+                <td>@ms.acName</td>
+                <td>@ms.acBudget</td>
+                <td>@acResult[ms.acResult]</td>
+                <td>@ms.RoleName</td>
+                <td><a onclick="Edit('@ms.acName','@ms.acBudget','@ms.acResult','@ms.acRole','@ms.acBeginTime.Value.ToString("yyyy-MM-dd")','@ms.acEndTime.Value.ToString("yyyy-MM-dd")','@ms.acId')" style="cursor:pointer">编辑</a></td>
+                <td><a onclick="CRMdelete(@ms.acId)" style="cursor:pointer">删除</a></td>
+            </tr>
+        }
+    </table>
+    <div>
+                @Html.Pager(pagems, new PagerOptions
+        {
+            FirstPageText = "第一页",
+            LastPageText = "最后页",
+            NextPageText = "下一页",
+            PrevPageText = "上一页",
+            NumericPagerItemCount = 5,
+            HorizontalAlign = "right",
+            PageIndexParameterName = "PageCount",
+            ContainerTagName = "ul",
+            CssClass = "pagination",
+            CurrentPagerItemTemplate = "<li class='active'><a href='#'>{0}</a></li>",
+            DisabledPagerItemTemplate = "<li class='disabled'><a>{0}</a></li>",
+            PagerItemTemplate = "<li>{0}</li>",
+            Id = "bootstrappager"
+        })
+    </div>
+    </div>
+<script type="text/javascript">
+    $('#acBeginTime').datetimepicker({
+        format: 'yyyy-mm-dd hh:ii',
+        language: 'zh-CN'
+    });
+    $('#acEndTime').datetimepicker({
+        format: 'yyyy-mm-dd hh:ii',
+        language: 'zh-CN'
+    });
+    //新增修改
+    function AddOrEdit() {
+        var amName = $("#acName").val();
+        var amBudget = $("#acBudget").val();
+        var amId = $("#acId").val();
+        var amResult = $("#acResult").val();
+        var amfkRole = $("#acRole").val();
+        var amBeginTime = $("#acBeginTime").val();
+        var amEndTime = $("#acEndTime").val();
+        if (acName == "") {
+            alert("请输入活动名称！");
+            return false;
+        }
+        if (acBudget == "") {
+            alert("请输入活动预算！");
+            return false;
+        }
+        if (acResult == -1) {
+            alert("请选择活动预期！");
+            return false;
+        }
+        if (acRole == -1) {
+            alert("请选择责任人！");
+            return false;
+        }
+        if (acBeginTime == "") {
+            alert("请输入开始时间！");
+            return false;
+        }
+        if (acEndTime == "") {
+            alert("请输入结束时间！");
+            return false;
+        }
+        if (acId == "") {
+            var jsonString = "";
+            jsonString = "{\"acName\":\"" + acName + "\",\"acBudget\":\"" + acBudget + "\",\"acResult\":\"" + amResult + "\",\"acRole\":\"" + acRole + "\",\"acBeginTime\":\"" + acBeginTime + "\",\"acEndTime\":\"" + acEndTime + "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Activity/Add",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("添加成功！");
+                        location.href = "/Activity/Index";
+                    } else {
+                        alert("添加失败！");
+                    }
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        } else {
+            var jsonString = "";
+            jsonString = "{\"acName\":\"" + acName + "\",\"acBudget\":\"" + acBudget + "\",\"acResult\":\"" + amResult + "\",\"acRole\":\"" + acRole + "\",\"acBeginTime\":\"" + acBeginTime + "\",\"acEndTime\":\"" + acEndTime + "\",\"acId\":\"" + acId + "\"}";
+            $.ajax({
+                type: "POST",   //访问WebService使用Post方式请求
+                contentType: "application/json", //WebService 会返回Json类型
+                url: "../Activity/Edit",
+                data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+                dataType: 'json',
+                success: function (result) {     //回调函数，result，返回值
+                    if (result.messagecode == "1") {
+                        alert("修改成功！");
+                        location.href = document.URL;
+                    } else {
+                        alert("修改失败！");
+                    }
+                    $("#acName").val("");
+                    $("#acBudget").val("");
+                    $("#acResult").val(-1);
+                    $("#acRole").val(-1);
+                    $("#acBeginTime").val("");
+                    $("#acEndTime").val("");
+                    $("#acId").val("");
+                    $("#btn").val("新增");
+                    return false;
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                }
+            });
+        }
+
+    }
+    //删除
+    function CRMdelete(acId) {
+        var jsonString = "";
+        jsonString = "{\"acId\":\"" + acId + "\"}";
+        $.ajax({
+            type: "POST",   //访问WebService使用Post方式请求
+            contentType: "application/json", //WebService 会返回Json类型
+            url: "../Activity/Delete",
+            data: jsonString,   //这里是要传递的参数，格式为 data: "{paraName:paraValue}",下面将会看到
+            dataType: 'json',
+            success: function (result) {     //回调函数，result，返回值
+                if (result.messagecode == "1") {
+                    alert("删除成功！");
+                    location.href = "/Activity/Index";
+                } else {
+                    alert("删除失败！");
+                }
+                return false;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+            }
+        });
+    }
+    //编辑
+    function Edit(acName, acBudget, acResult, acRole, acBeginTime, acEndTime, acId) {
+        $("#acName").val(amName);
+        $("#acBudget").val(amBudget);
+        $("#acResult").val(amResult);
+        $("#acRole").val(amfkRole);
+        $("#acBeginTime").val(amBeginTime);
+        $("#acEndTime").val(amEndTime);
+        $("#acId").val(amId);
+        $("#btn").val("编辑");
+    }
+    //查询
+    function Search() {
+        var acName = $("#acName").val();
+        var acResult = $("#acResult").val();
+        var acRole = $("#acRole").val();
+        location.href = "/Activity/Index?acName=" + acName + "&acResult=" + acResult + "&acRole=" + acRole;
+    }
+
+</script>
+
+
+
+
+
